@@ -80,7 +80,7 @@ export default function Signup() {
     <div className="relative flex flex-col items-center justify-center min-h-screen overflow-hidden">
 
       <div className="w-full p-6 bg-white rounded-md shadow-md lg:max-w-xl">
-        <h1 className="text-3xl font-bold text-center text-gray-700">Logo</h1>
+        <h1 onClick={() => { router.push('/') }} className="text-3xl font-bold text-center text-gray-700">Logo</h1>
         <form
           onSubmit={submitSignUpForm}
           className="mt-6">

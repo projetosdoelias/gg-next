@@ -3,6 +3,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useState } from 'react'
 import { showErrorToast, showSuccessToast } from '@/src/common/utils/toast-message.helper';
 import { useRouter } from 'next/navigation'
+import { cookies } from 'next/headers'
 
 
 export default function Login() {
@@ -22,45 +23,44 @@ export default function Login() {
   const submitLoginForm = async (event: any) => {
 
     event.preventDefault();
-
-    const mainUrl = (process.env.URL_API) ? process.env.URL_API : 'http://localhost:3009';
-    const defaultError = 'Oops! Something went wrong during sign-up. Please try again later.'
+    const defaultErrorMsg = 'Oops! Something went wrong during sign-up. Please try again later.'
 
     const data = {
       email: event.target.email.value,
       password: event.target.password.value,
     };
-    
-    const retorno = await fetch(`${mainUrl}/auth/login`, {
+
+    const retorno = await fetch(`/api/session`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(data),
+
     })
 
-    if (retorno) {
-      try {
-        const dataReturn = await retorno.json()
-        
-        if ((retorno?.status === 201 || retorno?.status === 200)) {
-          showSuccessToast("Welcome back!")
-          router.push('/')
-          return;
-        }
 
-        const serverErrorMsg = dataReturn?.message || defaultError
-        showErrorToast(serverErrorMsg, 3000)
-        return;
-      } catch (error) {
-        showErrorToast(defaultError, 3000)
-      }
+    if (!retorno) {
+      showErrorToast(defaultErrorMsg, 3000)
+      return;
     }
 
-    showErrorToast(defaultError, 3000)
+    const dataReturn = await retorno.json()
+    try {
 
-    return;
+      if ((retorno?.status === 201 || retorno?.status === 200)) {
+        showSuccessToast("Welcome back!");
+        return;
+      } else {
+        const errorMessage = dataReturn?.message ?? defaultErrorMsg;
+        throw new Error(errorMessage);
+      }
+
+    } catch (error: any) {
+      showErrorToast(error?.message, 3000)
+      return;
+    }
   };
 
   return (
@@ -111,6 +111,9 @@ export default function Login() {
               className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-gray-700 rounded-md hover:bg-gray-600 focus:outline-none focus:bg-gray-600">
               Login
             </button>
+          </div>
+          <div className='content-center text-center'>
+            <p className=" pt-[10px] text-[14px] ">Not a member yet? <a onClick={() => { router.push('/signup') }} className='font-bold cursor-pointer' >Sign up and lets grow!</a></p>
           </div>
         </form>
       </div>
