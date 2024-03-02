@@ -12,7 +12,6 @@ export async function POST(req: Request) {
   const defaultErrorMsg = 'Oops! Something went wrong during sign-up. Please try again later.'
   try {
 
-    
     const backEndUrl = (process.env.URL_API) ? process.env.URL_API : 'http://localhost:3009';
     const { email, password } = await req.json()
 
