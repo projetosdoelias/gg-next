@@ -37,7 +37,6 @@ export default function Login() {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(data),
-
     })
 
 
@@ -51,6 +50,7 @@ export default function Login() {
 
       if ((retorno?.status === 201 || retorno?.status === 200)) {
         showSuccessToast("Welcome back!");
+        router.push('/plants')
         return;
       } else {
         const errorMessage = dataReturn?.message ?? defaultErrorMsg;
