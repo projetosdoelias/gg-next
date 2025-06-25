@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ggBackendApi } from "@/lib/gg-backend-api";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [erro, setErro] = useState("");
+  const { login } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,8 +28,7 @@ export default function LoginPage() {
       }
 
       const { access_token } = await res.data;
-      localStorage.setItem("token", access_token);
-      router.push("/dashboard");
+      login(access_token);
     } catch (err: any) {
       setErro(err.message || "Erro inesperado");
     }
