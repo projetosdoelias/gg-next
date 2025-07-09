@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { ggBackendApi } from "@/lib/gg-backend-api";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useAuth } from "@/context/AuthContext";
-import Image from "next/image";
-import Link from "next/link"; // adicione isso no topo
+import PlantCard from "@/components/PlantCard";
+import Link from "next/link";
 
 interface Plant {
   id: number;
@@ -38,6 +38,31 @@ export default function DashboardPage() {
     fetchPlants();
   }, []);
 
+  const handleDelete = async (id: number) => {
+    const confirm = window.confirm(
+      "Tem certeza que deseja excluir esta planta?"
+    );
+    if (!confirm) return;
+
+    try {
+      await ggBackendApi.delete(`/plants/${id}`);
+      setPlants(plants.filter((plant) => plant.id !== id));
+    } catch (error) {
+      console.error("Erro ao excluir planta:", error);
+      alert("Erro ao excluir planta");
+    }
+  };
+
+  const handleEdit = (id: number) => {
+    console.log("Editar planta:", id);
+    // router.push(`/plants/${id}/edit`);
+  };
+
+  const handleView = (id: number) => {
+    console.log("Ver acompanhamentos da planta:", id);
+    // router.push(`/plants/${id}/trackings`);
+  };
+
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-[#f8f5f0] flex flex-col items-center px-4 py-8">
@@ -59,6 +84,7 @@ export default function DashboardPage() {
             </button>
           </div>
         </div>
+
         {/* Grid */}
         <div className="w-full max-w-7xl">
           {loading ? (
@@ -66,37 +92,13 @@ export default function DashboardPage() {
           ) : (
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {plants.map((plant) => (
-                <div
+                <PlantCard
                   key={plant.id}
-                  className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition"
-                >
-                  {/* Imagem */}
-                  {plant.media_profile_photo?.fileUrl ? (
-                    <Image
-                      src={plant.media_profile_photo?.fileUrl}
-                      alt={plant.name}
-                      width={400}
-                      height={250}
-                      className="w-full h-48 object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-48 bg-[#d9d3c9] flex items-center justify-center text-[#2c4631] text-sm italic">
-                      Sem imagem
-                    </div>
-                  )}
-
-                  {/* Conteúdo */}
-                  <div className="p-4">
-                    <h2 className="text-lg font-semibold text-[#2c4631] mb-1">
-                      {plant.name}
-                    </h2>
-                    <p className="text-sm text-gray-700">
-                      {plant.description.length > 120
-                        ? `${plant.description.slice(0, 120)}...`
-                        : plant.description}
-                    </p>
-                  </div>
-                </div>
+                  plant={plant}
+                  onDelete={handleDelete}
+                  onEdit={handleEdit}
+                  onView={handleView}
+                />
               ))}
             </div>
           )}
