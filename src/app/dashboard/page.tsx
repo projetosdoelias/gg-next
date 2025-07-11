@@ -76,12 +76,6 @@ export default function DashboardPage() {
             >
               Nova Planta
             </Link>
-            <button
-              onClick={logout}
-              className="bg-[#2c4631] hover:bg-[#1e3524] text-white px-4 py-2 rounded text-sm"
-            >
-              Sair
-            </button>
           </div>
         </div>
 

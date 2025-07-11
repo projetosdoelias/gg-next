@@ -130,9 +130,18 @@ export default function PlantDetailsPage() {
 
         {/* Tabela de Acompanhamentos */}
         <div className="bg-white rounded-lg shadow p-4">
-          <h2 className="text-xl font-semibold text-[#2c4631] mb-4">
-            Acompanhamentos
-          </h2>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+            <h2 className="text-xl font-semibold text-[#2c4631]">
+              Acompanhamentos
+            </h2>
+
+            <Link
+              href={`/plants/${plant.id}/reports/new`}
+              className="mt-2 md:mt-0 inline-block bg-[#5b845f] hover:bg-[#3b5a41] text-white px-4 py-2 rounded text-sm transition"
+            >
+              + Novo Acompanhamento
+            </Link>
+          </div>
 
           {plant.reports.length === 0 ? (
             <p className="text-gray-600">Nenhum acompanhamento registrado.</p>
