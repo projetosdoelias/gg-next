@@ -1,7 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { TrashIcon, PencilIcon, EyeIcon } from "@heroicons/react/24/solid";
+import {
+  TrashIcon,
+  PencilIcon,
+  EyeIcon,
+  ClipboardDocumentListIcon,
+} from "@heroicons/react/24/solid";
 import Link from "next/link";
 
 interface Plant {
@@ -60,6 +65,14 @@ export default function PlantCard({
               ? `${plant.description.slice(0, 120)}...`
               : plant.description}
           </p>
+
+          <Link
+            href={`/plants/${plant.id}/reports/new`}
+            className="inline-flex items-center gap-1 mt-2 bg-[#5b845f] hover:bg-[#3b5a41] text-white px-3 py-1 rounded text-xs transition"
+          >
+            <ClipboardDocumentListIcon className="w-4 h-4" />
+            Novo Acompanhamento
+          </Link>
         </div>
 
         {/* Ações */}
