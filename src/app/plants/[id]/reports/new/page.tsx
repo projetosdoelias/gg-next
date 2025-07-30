@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ggBackendApi } from "@/lib/gg-backend-api";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { XMarkIcon } from "@heroicons/react/24/solid";
 
 export default function NewReportPage() {
   const { id: plantId } = useParams<{ id: string }>();
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
     week: 0,
@@ -26,6 +28,8 @@ export default function NewReportPage() {
     humidity: 0,
     date: "",
   });
+
+  const [photos, setPhotos] = useState<File[]>([]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -47,12 +51,33 @@ export default function NewReportPage() {
     }));
   };
 
+  const handlePhotosChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const newPhoto = e.target.files[0];
+      setPhotos((prev) => [...prev, newPhoto]);
+      e.target.value = ""; // Reset input para permitir a mesma foto novamente se desejado
+    }
+  };
+
+  const removePhoto = (index: number) => {
+    setPhotos((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const formData = new FormData();
+    Object.entries(form).forEach(([key, value]) => {
+      formData.append(key, String(value));
+    });
+    formData.append("plant_id", String(plantId));
+
+    photos.forEach((photo) => {
+      formData.append("photos[]", photo);
+    });
+
     try {
-      await ggBackendApi.post(`/plants/${plantId}/reports`, {
-        ...form,
-        plant_id: plantId,
+      await ggBackendApi.post(`/plants/${plantId}/reports`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
       alert("Acompanhamento criado com sucesso!");
       router.push(`/plants/${plantId}`);
@@ -274,7 +299,59 @@ export default function NewReportPage() {
               className="w-full border border-gray-300 rounded px-3 py-2"
             ></textarea>
           </div>
+          {/* Upload de Fotos */}
+          <div>
+            <label className="block text-[#2c4631] mb-1">
+              Fotos do Acompanhamento
+            </label>
 
+            <div>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="bg-[#5b845f] text-white px-4 py-2 rounded hover:bg-[#3b5a41] transition"
+              >
+                Selecionar Fotos
+              </button>
+
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                onChange={handlePhotosChange}
+                className="hidden"
+              />
+            </div>
+          </div>
+
+          {/* Pré-visualização */}
+          {photos.length > 0 && (
+            <div className="mt-4">
+              <p className="text-sm text-[#2c4631] mb-2">Pré-visualização:</p>
+              <div className="flex flex-wrap gap-4">
+                {photos.map((photo, index) => (
+                  <div
+                    key={index}
+                    className="relative w-24 h-24 rounded overflow-hidden border border-gray-300"
+                  >
+                    <img
+                      src={URL.createObjectURL(photo)}
+                      alt={`Prévia ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removePhoto(index)}
+                      className="absolute top-0 right-0 bg-red-600 text-white rounded-full p-1 hover:bg-red-700"
+                      title="Remover foto"
+                    >
+                      <XMarkIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           <button
             type="submit"
             className="w-full bg-[#5b845f] text-white px-4 py-2 rounded hover:bg-[#3b5a41] transition"
