@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ggBackendApi } from "@/lib/gg-backend-api";
+import Link from "next/link"; // Adicione este import no topo
 
 interface Media {
   id: number;
@@ -69,7 +70,18 @@ export default function ReportPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-4">Relatório: {report.title}</h1>
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
+        <h1 className="text-2xl font-bold text-gray-900">
+          Relatório: {report.title}
+        </h1>
+
+        <Link
+          href={`/plants/${id}`}
+          className="inline-flex items-center px-4 py-2 rounded-md bg-[#2c4631] text-white text-sm font-medium hover:bg-[#1e3524] transition"
+        >
+          ← Voltar
+        </Link>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div>
